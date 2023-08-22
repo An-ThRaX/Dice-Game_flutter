@@ -19,8 +19,8 @@ class DiceGenerator extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final int result = getRandomNumber();
     
+    final int randomDieNumber = getRandomNumber();
 
     return Container(
       width: 55,
@@ -28,7 +28,7 @@ class DiceGenerator extends StatelessWidget {
       color: Colors.grey[300],
       child: Center(
         child: Text(
-          "$result",
+          "$randomDieNumber",
           style: const TextStyle(
             fontFamily: "Caveat",
             fontSize: 25,
@@ -45,6 +45,7 @@ class _DiceGameState extends State<DiceGame> {
   List <Widget> diceWidgets = []; // Store the dice widgets
   int dieCount = 0;
   int sum =0;
+  
 
 
   void increaseNumberOfDie(){
@@ -55,6 +56,7 @@ class _DiceGameState extends State<DiceGame> {
 
     });
   }
+
 
   void decreaseNumberOfDie(){
     if (diceWidgets.isNotEmpty){

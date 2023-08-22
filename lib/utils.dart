@@ -18,7 +18,7 @@ class AddLogoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: CircleAvatar(
         backgroundImage: AssetImage("assets/pictures/dice2a.jpg"),
         radius: 40.0,
