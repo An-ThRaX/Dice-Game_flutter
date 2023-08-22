@@ -7,36 +7,8 @@ import 'package:the_die_game/main.dart';
 int getRandomNumber(){
   final random = Random();
   return random.nextInt(6)+1;
-}
-
-
-
-
-// create widgets which returns a "dice" with a random number in it
-
-// class DiceGenerator extends StatelessWidget {
-//   DiceGenerator({super.key});
   
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: 55,
-//       height: 55,
-//       color: Colors.grey[300],
-//       child: Center(
-//         child: Text(
-//           "$result",
-//           style: const TextStyle(
-//             fontFamily: "Caveat",
-//             fontSize: 10,
-//             fontWeight: FontWeight.bold,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+}
 
 
 // create a widget to add a logo
@@ -51,6 +23,49 @@ class AddLogoWidget extends StatelessWidget {
         backgroundImage: AssetImage("assets/pictures/dice2a.jpg"),
         radius: 40.0,
       ),
+    );
+  }
+}
+
+class ButtonTextStylingWidget extends StatelessWidget {
+  final String buttonText;
+
+  const ButtonTextStylingWidget({required this.buttonText, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      buttonText,
+      style: const TextStyle(
+        fontFamily: 'Caveat',
+        letterSpacing: 1.5,
+        fontWeight: FontWeight.bold,
+        fontSize: 15.0,
+        color: Color.fromARGB(255, 63, 199, 204),
+      ),
+    );
+  }
+}
+
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
+  
+  // what the heck is this??????
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: const Text(
+        "Welcome to the dice game!",
+        style: TextStyle(
+          fontFamily: 'Caveat',
+          color: Color.fromARGB(255, 63, 199, 204),
+        ),
+      ),
+      centerTitle: true,
+      backgroundColor: Colors.grey[850],
+      elevation: 0,
     );
   }
 }

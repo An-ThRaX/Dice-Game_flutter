@@ -14,11 +14,14 @@ class DiceGame extends StatefulWidget {
   State<DiceGame> createState() => _DiceGameState();
 }
 
+// create a widget which will generate a new dice with a random num 
 class DiceGenerator extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final int result = getRandomNumber(); // Generate a new random number
+    final int result = getRandomNumber();
+    
+
     return Container(
       width: 55,
       height: 55,
@@ -37,14 +40,19 @@ class DiceGenerator extends StatelessWidget {
   }
 }
 
+
 class _DiceGameState extends State<DiceGame> {
-  List <Widget> diceWidgets = []; // List to store the dice widgets
+  List <Widget> diceWidgets = []; // Store the dice widgets
   int dieCount = 0;
+  int sum =0;
+
 
   void increaseNumberOfDie(){
     setState(() {
       diceWidgets.add(DiceGenerator());
       dieCount ++;
+
+
     });
   }
 
@@ -67,20 +75,6 @@ class _DiceGameState extends State<DiceGame> {
     });
   }
 
-// create a widget for button's text styling
-  Widget _buttonTextStylingWidget(String buttonText){
-    return Text(
-      buttonText,
-      style: TextStyle(
-        fontFamily: 'Caveat',
-        letterSpacing: 1.5,
-        fontWeight: FontWeight.bold,
-        fontSize: 15.0,
-        color: Color.fromARGB(255, 63, 199, 204),
-      ),
-    );
-  }
-
 
 // create a widget to add a dice
   Widget _increaseNumberOfDieWidget(){
@@ -92,11 +86,10 @@ class _DiceGameState extends State<DiceGame> {
       onPressed: (){
         setState(() {
           increaseNumberOfDie();
-          rollDice(); // call the method to roll the dice
         });
       },
       // use a widget for the buttons styling
-      child: _buttonTextStylingWidget("Add a die!"),
+      child: ButtonTextStylingWidget(buttonText: "Add a die!"),
     );
   }
 
@@ -109,27 +102,17 @@ class _DiceGameState extends State<DiceGame> {
         shape: StadiumBorder(),
         ),
       onPressed: decreaseNumberOfDie,
-      child: _buttonTextStylingWidget("Remove a die!"),
+      // use a widget for the buttons styling
+      child: ButtonTextStylingWidget(buttonText: "Remove a die!"),
     );
   }
 
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900],
-      appBar: AppBar(
-        title: const Text(
-          "Welcome to the dice game!",
-          style: TextStyle(
-            fontFamily: 'Caveat',
-            color: Color.fromARGB(255, 63, 199, 204),
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.grey[850],
-        elevation: 0,
-      ),
+      appBar: CustomAppBar(), // import the widget from utils
       body: Padding(
         padding: EdgeInsets.fromLTRB(30, 40, 30, 0),
         child: Column(
@@ -139,10 +122,11 @@ class _DiceGameState extends State<DiceGame> {
             AddLogoWidget(),
 
             // creates the line under the thumb picture
-            Divider(  
+            Divider(
               height: 60.0,  // is the height above and under the line
               color: Colors.grey[800],
             ),
+
             Row(  // main top row which will hold the two rows which have the buttons
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -168,7 +152,7 @@ class _DiceGameState extends State<DiceGame> {
                     ),
                     SizedBox(width: 15.0,),
                     Text(
-                      "this is dice sum",
+                      "this is dice sum: ",
                       style: TextStyle(
                         fontSize: 15.0,
                         color: Color.fromARGB(255, 63, 199, 204),
