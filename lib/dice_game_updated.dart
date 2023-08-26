@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:fl_e3/other/utils.dart';
+import 'package:the_die_game/utils.dart';
 import 'package:flutter/material.dart';
 
 /// UPDATED HERE
@@ -15,7 +15,7 @@ class DiceGame extends StatefulWidget {
   State<DiceGame> createState() => _DiceGameState();
 }
 
-// create a widget which will generate a new dice with a random num
+// create a widget which will generate a new die with a random num
 class DiceGenerator extends StatelessWidget {
   /// UPDATED HERE
   const DiceGenerator({super.key, required this.controller});
