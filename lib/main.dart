@@ -1,7 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:the_die_game/utils.dart';
+import 'create_logo.dart';
+import 'custom_app_bar.dart';
+import 'dice_logic.dart';
+import 'create_buttons.dart';
 
 void main() => runApp(MaterialApp(
   home: DiceGame(),
@@ -14,121 +17,94 @@ class DiceGame extends StatefulWidget {
   State<DiceGame> createState() => _DiceGameState();
 }
 
-class DiceGenerator extends StatelessWidget {
-  
+/// Better ... this is how flutter optimizes the build process
+/// As child for another widget,
+/// the _IncreaseNumberOfDieWidget is not always recreated even if the build method is called
+
+// create a widget which adds a new dice on the screen
+class _IncreaseNumberOfDieWidget extends StatelessWidget {
+  const _IncreaseNumberOfDieWidget({
+    this.increaseNumberOfDie,
+    Key? key,
+  }) : super(key: key);
+
+  final VoidCallback? increaseNumberOfDie;
+
   @override
   Widget build(BuildContext context) {
-    final int result = getRandomNumber(); // Generate a new random number
-    return Container(
-      width: 55,
-      height: 55,
-      color: Colors.grey[300],
-      child: Center(
-        child: Text(
-          "$result",
-          style: const TextStyle(
-            fontFamily: "Caveat",
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.grey[700],
+        shape: StadiumBorder(),
       ),
+      onPressed: () {
+        increaseNumberOfDie?.call();
+      },
+      // use a widget for the buttons styling
+      child: ButtonTextStylingWidget(buttonText: "Add a die!"),
     );
   }
 }
 
-class _DiceGameState extends State<DiceGame> {
-  List <Widget> diceWidgets = []; // List to store the dice widgets
-  int dieCount = 0;
 
-  void increaseNumberOfDie(){
+class _DiceGameState extends State<DiceGame> {
+  // create a list of DiceControllers in which the values are stored
+  List<DiceController> diceControllers = [];
+
+  int dieCount = 0;
+  
+  int calculateTotalSum(){
+    int totalSum = 0;
+    for (final controller in diceControllers){
+      totalSum += controller.currentValue.value;
+    }
+    return totalSum;
+  }
+
+  void increaseNumberOfControllers() {
     setState(() {
-      diceWidgets.add(DiceGenerator());
-      dieCount ++;
+      diceControllers.add(DiceController());
+      dieCount++;
     });
   }
 
-  void decreaseNumberOfDie(){
-    if (diceWidgets.isNotEmpty){
+  void decreaseNumberOfControllers() {
+    ///
+    if (dieCount > 0) {
       setState(() {
-        diceWidgets.removeLast();
-        dieCount --;
+        diceControllers.removeLast();
+        dieCount--;
       });
     }
   }
 
-  void rollDice(){
-    setState(() {
-      for (int i = 0; i < diceWidgets.length; i++){
-        if (diceWidgets[i] is DiceGenerator){
-          diceWidgets[i] = DiceGenerator(); // generate a new dice
-        }
-      }
-    });
+  void rollDice() {
+    for (final controller in diceControllers) {
+      controller.generateNewDiceValue();
+    }
+    /// maybe use postframecallback so that dicecontrollerß udpate their "state" and then you can sum
   }
 
-// create a widget for button's text styling
-  Widget _buttonTextStylingWidget(String buttonText){
-    return Text(
-      buttonText,
-      style: TextStyle(
-        fontFamily: 'Caveat',
-        letterSpacing: 1.5,
-        fontWeight: FontWeight.bold,
-        fontSize: 15.0,
-        color: Color.fromARGB(255, 63, 199, 204),
-      ),
-    );
-  }
-
-
-// create a widget to add a dice
-  Widget _increaseNumberOfDieWidget(){
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.grey[700],
-        shape: StadiumBorder(),
-        ),
-      onPressed: (){
-        setState(() {
-          increaseNumberOfDie();
-        });
-      },
-      // use a widget for the buttons styling
-      child: _buttonTextStylingWidget("Add a die!"),
-    );
-  }
-
-
+  /// should have the same as the other one
 // create a widget to remove a dice
-  Widget _decreaseNumberOfDieWidget(){
+  Widget _decreaseNumberOfDieWidget() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.grey[700],
         shape: StadiumBorder(),
-        ),
-      onPressed: decreaseNumberOfDie,
-      child: _buttonTextStylingWidget("Remove a die!"),
+      ),
+      onPressed: decreaseNumberOfControllers,
+      // use a widget for the buttons styling
+      child: ButtonTextStylingWidget(buttonText: "Remove a die!"),
     );
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900],
-      appBar: AppBar(
-        title: const Text(
-          "Welcome to the dice game!",
-          style: TextStyle(
-            fontFamily: 'Caveat',
-            color: Color.fromARGB(255, 63, 199, 204),
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.grey[850],
-        elevation: 0,
-      ),
+      // import the widget from utils
+      appBar: CustomAppBar(), 
       body: Padding(
         padding: EdgeInsets.fromLTRB(30, 40, 30, 0),
         child: Column(
@@ -136,53 +112,57 @@ class _DiceGameState extends State<DiceGame> {
           children: <Widget>[
             // use a predifined widget for the logo
             AddLogoWidget(),
-
             // creates the line under the thumb picture
-            Divider(  
-              height: 60.0,  // is the height above and under the line
+            Divider(
+              height: 60.0, // is the height above and under the line
               color: Colors.grey[800],
             ),
-            Row(  // main top row which will hold the two rows which have the buttons
+            Row(
+              // main top row which will hold the two rows which have the buttons
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Row( // first row which will hold "Roll the dice" and the sum
+                Row(
+                  // first row which will hold "Roll the dice" and the sum
                   children: [
-      // this still has to be refractored
                     ElevatedButton(
                       onPressed: rollDice,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[700],
                         shape: StadiumBorder(),
                       ),
-                      child: const Text(
-                        "Roll the dice!",
-                        style: TextStyle(
-                          fontFamily: 'Caveat',
-                          letterSpacing: 1.5,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15.0,
-                          color: Color.fromARGB(255, 63, 199, 204),
-                        ),
-                      ),
+                      child: ButtonTextStylingWidget(buttonText: "Roll the dice!"),
                     ),
-                    SizedBox(width: 15.0,),
-                    Text(
-                      "this is dice sum",
-                      style: TextStyle(
-                        fontSize: 15.0,
-                        color: Color.fromARGB(255, 63, 199, 204),
-                      ),
+                    SizedBox(
+                      width: 15.0,
+                    ),
+                    Builder(
+                      builder: (BuildContext context) {
+                        return Text(
+                          "this is dice sum: ${calculateTotalSum()} ",
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            color: Color.fromARGB(255, 63, 199, 204),
+                          ),
+                        );
+                      }
                     ),
                   ],
                 ),
-                Row( // second row which holds the widgets for "Add a die", total num of die
-                // and the "Remove a die"
+                Row(
+                  // second row which holds the widgets for "Add a die", total num of die
+                  // and the "Remove a die"
                   children: [
                     // call the widget which builds the button to add die
-                    _increaseNumberOfDieWidget(),
-
-                    SizedBox(width: 15.0,),
-
+                    _IncreaseNumberOfDieWidget(
+                      increaseNumberOfDie: () {
+                        setState(() {
+                          increaseNumberOfControllers();
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      width: 15.0,
+                    ),
                     // add a text with the count of die
                     Text(
                       "Total number of die on table: $dieCount",
@@ -192,27 +172,30 @@ class _DiceGameState extends State<DiceGame> {
                       ),
                     ),
                     SizedBox(width: 15.0),
-
                     // call the widget which builds the buttom to remove die
                     _decreaseNumberOfDieWidget(),
                   ],
                 ),
               ],
             ),
-            Divider(  // creates the line under the thumb picture
-              height: 60.0,  // is the height above and under the line
+            Divider(
+              // creates the line under the thumb picture
+              height: 60.0, // is the height above and under the line
               color: Colors.grey[800],
             ),
-            Column(
-              // here should be all the widgets which spawn a dice and it's num
-              children: diceWidgets,
-            ),
+            Row(
+                // here should be all the widgets which spawn a dice and it's num
+                children: <Widget>[
+                  ...diceControllers.map(
+                      (controller) => DiceGenerator(controller: controller))
+                ]),
           ],
         ),
       ),
     );
   }
 }
+
 
 
 
